@@ -4,7 +4,7 @@ const GameBoard = (() => {
   const squareFactory = (index) => {
     let value = "";
 
-    const setValue = (playerValue) => (this.value = playerValue);
+    const setValue = (playerValue) => value = playerValue;
     const getValue = () => value;
     const getIndex = () => index;
 
@@ -29,26 +29,36 @@ const playerFactory = (name, digit) => {
 };
 
 const gameController = (() => {
-  const player1 = playerFactory("player1", "x");
+  const player1 = playerFactory("player1", "X");
   const player2 = playerFactory("player2", "O");
+  const board = GameBoard.getBoard();
   
   let currentPlayer = player1;
 
   const getCurrentPlayer = () => currentPlayer;
 
-  return { getCurrentPlayer }
+  const switchPlayer = () => {
+    currentPlayer = currentPlayer === player1 ? player2 : player1;
+    console.log(currentPlayer.getName());
+  }
+
+  const playTurn = (e) => {
+    const digit = currentPlayer.getDigit();
+    const index = e.target.dataset.index;
+    board[index].setValue(digit);
+    switchPlayer();
+  }
+
+  return { getCurrentPlayer, playTurn }
 })();
 
 const displayController = (() => {
   const container = document.querySelector(".gridContainer");
   const board = GameBoard.getBoard();
-  const player = gameController.getCurrentPlayer();
 
   const updateBoard = (e) => {
-    const digit = player.getDigit();
-    board[e.target.dataset.index].setValue(digit);
-    e.target.textContent = digit;
-
+    const player = gameController.getCurrentPlayer();
+    e.target.innerText = player.getDigit();
   };
   
   //Initialize board
@@ -57,7 +67,10 @@ const displayController = (() => {
     newSquare.classList.add("gridBtn");
     newSquare.dataset.index = square.getIndex();
     newSquare.textContent = square.getValue();
-    newSquare.addEventListener('click', updateBoard);
+    newSquare.addEventListener('click', function (e) {
+      updateBoard(e);
+      gameController.playTurn(e);
+    });
     container.appendChild(newSquare);
   });
 

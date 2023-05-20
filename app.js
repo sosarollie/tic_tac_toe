@@ -1,8 +1,8 @@
-let GameBoard = (() => {
+const GameBoard = (() => {
   let gameBoard = [];
 
   const squareFactory = (index) => {
-    let value = 0;
+    let value = "";
 
     const setValue = (playerValue) => (this.value = playerValue);
     const getValue = () => value;
@@ -28,27 +28,37 @@ const playerFactory = (name, digit) => {
   return { getName, getDigit };
 };
 
-let displayController = (() => {
-  const container = document.querySelector(".gridContainer");
-
-  for (let i = 0; i < 9; i++) {
-    const newSquare = document.createElement("button");
-    newSquare.classList.add("gridBtn");
-    newSquare.dataset.index = i;
-    newSquare.addEventListener(
-      "click",
-      currentPlayer.markSquare(newSquare.dataset.index, currentPlayer.digit)
-    );
-    container.appendChild(newSquare);
-  }
-
-  const render = () => {
-    const buttons = document.querySelectorAll(".gridBtn");
-  };
-})();
-
-let gameController = (() => {
+const gameController = (() => {
   const player1 = playerFactory("player1", "x");
   const player2 = playerFactory("player2", "O");
+  
   let currentPlayer = player1;
+
+  const getCurrentPlayer = () => currentPlayer;
+
+  return { getCurrentPlayer }
+})();
+
+const displayController = (() => {
+  const container = document.querySelector(".gridContainer");
+  const board = GameBoard.getBoard();
+  const player = gameController.getCurrentPlayer();
+
+  const updateBoard = (e) => {
+    const digit = player.getDigit();
+    board[e.target.dataset.index].setValue(digit);
+    e.target.textContent = digit;
+
+  };
+  
+  //Initialize board
+  board.forEach(square => {
+    const newSquare = document.createElement("button");
+    newSquare.classList.add("gridBtn");
+    newSquare.dataset.index = square.getIndex();
+    newSquare.textContent = square.getValue();
+    newSquare.addEventListener('click', updateBoard);
+    container.appendChild(newSquare);
+  });
+
 })();

@@ -39,38 +39,41 @@ const gameController = (() => {
 
   const switchPlayer = () => {
     currentPlayer = currentPlayer === player1 ? player2 : player1;
-    console.log(currentPlayer.getName());
   }
 
   const playTurn = (e) => {
     const digit = currentPlayer.getDigit();
     const index = e.target.dataset.index;
     board[index].setValue(digit);
-    switchPlayer();
   }
 
-  return { getCurrentPlayer, playTurn }
+  return { getCurrentPlayer, switchPlayer, playTurn }
 })();
 
 const displayController = (() => {
   const container = document.querySelector(".gridContainer");
   const board = GameBoard.getBoard();
-
+  
   const updateBoard = (e) => {
     const player = gameController.getCurrentPlayer();
     e.target.innerText = player.getDigit();
+    gameController.switchPlayer();
   };
   
+  const clickHandler = (e) => {
+    if (e.target.innerText == ""){
+      gameController.playTurn(e);
+      updateBoard(e);
+    }
+    
+  }
   //Initialize board
   board.forEach(square => {
     const newSquare = document.createElement("button");
     newSquare.classList.add("gridBtn");
     newSquare.dataset.index = square.getIndex();
     newSquare.textContent = square.getValue();
-    newSquare.addEventListener('click', function (e) {
-      updateBoard(e);
-      gameController.playTurn(e);
-    });
+    newSquare.addEventListener('click', clickHandler);
     container.appendChild(newSquare);
   });
 

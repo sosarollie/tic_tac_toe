@@ -41,10 +41,71 @@ const gameController = (() => {
     currentPlayer = currentPlayer === player1 ? player2 : player1;
   }
 
+  const endGame = () => {
+    const squares = document.querySelectorAll('.gridBtn');
+    squares.forEach(square => {
+      square.disabled = true;
+    });
+  }
+
+  const announceWinner = () => {
+    console.log(`The winner is ${currentPlayer.getName()}!`)
+    endGame();
+  }
+
+  const checkWinnerRow = (index) => {
+    const first = board[index].getValue();
+    const second = board[index + 1].getValue();
+    const third = board[index + 2].getValue();
+
+    if (first && second && third) {
+      if (first == second && second == third ){
+        announceWinner();
+      }
+    }
+  }
+
+  const checkWinnerColumn = (index) => {
+    const first = board[index].getValue();
+    const second = board[index + 3].getValue();
+    const third = board[index + 6].getValue();
+
+    if (first && second && third) {
+      if (first == second && second == third ){
+        announceWinner();
+      }
+    }
+  }
+
+  const checkWinnerDiagonals = () => {
+    const firstLeft = board[0].getValue();
+    const firstRight = board[2].getValue();
+    const second = board[4].getValue();
+    const thirdLeft = board[8].getValue();
+    const thirdRight= board[6].getValue();
+
+    if ((firstLeft && second && thirdLeft) || (firstRight && second && thirdRight)) {
+      if ((firstLeft == second && second == thirdLeft ) || (firstRight == second && second == thirdRight)){
+        announceWinner();
+      }
+    }
+  }
+
+  const checkWinner = () => {
+    for(let i = 0; i < 9; i += 3) {
+      checkWinnerRow(i);
+    }
+    for(let i = 0; i < 3; i ++) {
+      checkWinnerColumn(i);
+    }
+    checkWinnerDiagonals();
+  }
+
   const playTurn = (e) => {
     const digit = currentPlayer.getDigit();
     const index = e.target.dataset.index;
     board[index].setValue(digit);
+    checkWinner();
   }
 
   return { getCurrentPlayer, switchPlayer, playTurn }

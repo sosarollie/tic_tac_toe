@@ -4,7 +4,7 @@ const GameBoard = (() => {
   const squareFactory = (index) => {
     let value = "";
 
-    const setValue = (playerValue) => value = playerValue;
+    const setValue = (playerValue) => (value = playerValue);
     const getValue = () => value;
     const getIndex = () => index;
 
@@ -16,9 +16,18 @@ const GameBoard = (() => {
     gameBoard.push(square);
   }
 
+  const isTie = () => {
+    for (let i = 0; i < 9; i++) {
+      if (gameBoard[i].getValue() == "") {
+        return false;
+      }
+    }
+    return true;
+  };
+
   const getBoard = () => gameBoard;
 
-  return { getBoard };
+  return { getBoard, isTie };
 })();
 
 const playerFactory = (name, digit) => {
@@ -32,26 +41,26 @@ const gameController = (() => {
   const player1 = playerFactory("player1", "X");
   const player2 = playerFactory("player2", "O");
   const board = GameBoard.getBoard();
-  
+
   let currentPlayer = player1;
 
   const getCurrentPlayer = () => currentPlayer;
 
   const switchPlayer = () => {
     currentPlayer = currentPlayer === player1 ? player2 : player1;
-  }
+  };
 
   const endGame = () => {
-    const squares = document.querySelectorAll('.gridBtn');
-    squares.forEach(square => {
+    const squares = document.querySelectorAll(".gridBtn");
+    squares.forEach((square) => {
       square.disabled = true;
     });
-  }
+  };
 
   const announceWinner = () => {
-    console.log(`The winner is ${currentPlayer.getName()}!`)
+    console.log(`The winner is ${currentPlayer.getName()}!`);
     endGame();
-  }
+  };
 
   const checkWinnerRow = (index) => {
     const first = board[index].getValue();
@@ -59,11 +68,11 @@ const gameController = (() => {
     const third = board[index + 2].getValue();
 
     if (first && second && third) {
-      if (first == second && second == third ){
+      if (first == second && second == third) {
         announceWinner();
       }
     }
-  }
+  };
 
   const checkWinnerColumn = (index) => {
     const first = board[index].getValue();
@@ -71,71 +80,78 @@ const gameController = (() => {
     const third = board[index + 6].getValue();
 
     if (first && second && third) {
-      if (first == second && second == third ){
+      if (first == second && second == third) {
         announceWinner();
       }
     }
-  }
+  };
 
   const checkWinnerDiagonals = () => {
     const firstLeft = board[0].getValue();
     const firstRight = board[2].getValue();
     const second = board[4].getValue();
     const thirdLeft = board[8].getValue();
-    const thirdRight= board[6].getValue();
+    const thirdRight = board[6].getValue();
 
-    if ((firstLeft && second && thirdLeft) || (firstRight && second && thirdRight)) {
-      if ((firstLeft == second && second == thirdLeft ) || (firstRight == second && second == thirdRight)){
+    if (
+      (firstLeft && second && thirdLeft) ||
+      (firstRight && second && thirdRight)
+    ) {
+      if (
+        (firstLeft == second && second == thirdLeft) ||
+        (firstRight == second && second == thirdRight)
+      ) {
         announceWinner();
       }
     }
-  }
+  };
 
   const checkWinner = () => {
-    for(let i = 0; i < 9; i += 3) {
+    for (let i = 0; i < 9; i += 3) {
       checkWinnerRow(i);
     }
-    for(let i = 0; i < 3; i ++) {
+    for (let i = 0; i < 3; i++) {
       checkWinnerColumn(i);
     }
     checkWinnerDiagonals();
-  }
+  };
 
   const playTurn = (e) => {
     const digit = currentPlayer.getDigit();
     const index = e.target.dataset.index;
     board[index].setValue(digit);
     checkWinner();
-  }
+    if (GameBoard.isTie() == true) {
+      endGame();
+    }
+  };
 
-  return { getCurrentPlayer, switchPlayer, playTurn }
+  return { getCurrentPlayer, switchPlayer, playTurn };
 })();
 
 const displayController = (() => {
   const container = document.querySelector(".gridContainer");
   const board = GameBoard.getBoard();
-  
+
   const updateBoard = (e) => {
     const player = gameController.getCurrentPlayer();
     e.target.innerText = player.getDigit();
     gameController.switchPlayer();
   };
-  
+
   const clickHandler = (e) => {
-    if (e.target.innerText == ""){
+    if (e.target.innerText == "") {
       gameController.playTurn(e);
       updateBoard(e);
     }
-    
-  }
+  };
   //Initialize board
-  board.forEach(square => {
+  board.forEach((square) => {
     const newSquare = document.createElement("button");
     newSquare.classList.add("gridBtn");
     newSquare.dataset.index = square.getIndex();
     newSquare.textContent = square.getValue();
-    newSquare.addEventListener('click', clickHandler);
+    newSquare.addEventListener("click", clickHandler);
     container.appendChild(newSquare);
   });
-
 })();

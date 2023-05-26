@@ -38,11 +38,11 @@ const playerFactory = (name, digit) => {
 };
 
 const gameController = (() => {
-  const player1 = playerFactory("player1", "X");
-  const player2 = playerFactory("player2", "O");
+  let player1;
+  let player2;
   const board = GameBoard.getBoard();
 
-  let currentPlayer = player1;
+  let currentPlayer;
 
   const getCurrentPlayer = () => currentPlayer;
 
@@ -126,11 +126,20 @@ const gameController = (() => {
     }
   };
 
-  return { getCurrentPlayer, switchPlayer, playTurn };
+  const startGame = () => {
+    const nameInput1 = document.getElementById("input1");
+    const nameInput2 = document.getElementById("input2");
+    player1 = playerFactory(nameInput1.value, "X");
+    player2 = playerFactory(nameInput2.value, "O");
+    currentPlayer = player1;
+  };
+
+  return { getCurrentPlayer, switchPlayer, playTurn, startGame };
 })();
 
 const displayController = (() => {
   const container = document.querySelector(".gridContainer");
+  const startGameBtn = document.querySelector("#startBtn");
   const board = GameBoard.getBoard();
 
   const updateBoard = (e) => {
@@ -145,10 +154,30 @@ const displayController = (() => {
       updateBoard(e);
     }
   };
+
+  //Start button event listener
+  startGameBtn.addEventListener("click", function () {
+    const nameInput1 = document.getElementById("input1");
+    const nameInput2 = document.getElementById("input2");
+    if (nameInput1 != "" && nameInput2 != "") {
+      gameController.startGame();
+
+      const buttons = document.querySelectorAll(".gridBtn");
+      buttons.forEach((button) => {
+        button.classList.remove("no-click");
+      });
+
+      nameInput1.remove();
+      nameInput2.remove();
+      startGameBtn.remove();
+    }
+  });
+
   //Initialize board
   board.forEach((square) => {
     const newSquare = document.createElement("button");
     newSquare.classList.add("gridBtn");
+    newSquare.classList.add("no-click");
     newSquare.dataset.index = square.getIndex();
     newSquare.textContent = square.getValue();
     newSquare.addEventListener("click", clickHandler);

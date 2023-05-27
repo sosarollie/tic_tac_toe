@@ -40,14 +40,21 @@ const playerFactory = (name, digit) => {
 const gameController = (() => {
   let player1;
   let player2;
+  let end = false;
   const board = GameBoard.getBoard();
 
   let currentPlayer;
 
   const getCurrentPlayer = () => currentPlayer;
 
+  const getEndStatus = () => end;
+
   const switchPlayer = () => {
     currentPlayer = currentPlayer === player1 ? player2 : player1;
+  };
+
+  const noPlayer = () => {
+    currentPlayer = "";
   };
 
   const endGame = () => {
@@ -55,10 +62,12 @@ const gameController = (() => {
     squares.forEach((square) => {
       square.disabled = true;
     });
+    end = true;
   };
 
   const announceWinner = () => {
-    console.log(`The winner is ${currentPlayer.getName()}!`);
+    const container = document.querySelector(".playersContainer");
+    container.innerText = `The winner is ${currentPlayer.getName()}!`;
     endGame();
   };
 
@@ -134,7 +143,14 @@ const gameController = (() => {
     currentPlayer = player1;
   };
 
-  return { getCurrentPlayer, switchPlayer, playTurn, startGame };
+  return {
+    getCurrentPlayer,
+    getEndStatus,
+    switchPlayer,
+    playTurn,
+    startGame,
+    noPlayer,
+  };
 })();
 
 const displayController = (() => {
@@ -152,13 +168,34 @@ const displayController = (() => {
     if (e.target.innerText == "") {
       gameController.playTurn(e);
       updateBoard(e);
+      if (gameController.getEndStatus() == true) {
+        gameController.noPlayer();
+      } else updatePlayingDisplay();
     }
+  };
+
+  const updatePlayingDisplay = () => {
+    const container = document.querySelector(".playersContainer");
+    if (gameController.getCurrentPlayer != "") {
+      container.innerText =
+        gameController.getCurrentPlayer().getName() + "'s Turn";
+    }
+  };
+
+  const playingDisplay = () => {
+    const container = document.createElement("div");
+    const main = document.querySelector("main");
+
+    container.classList.add("playersContainer");
+    main.insertBefore(container, main.firstChild);
+    updatePlayingDisplay();
   };
 
   //Start button event listener
   startGameBtn.addEventListener("click", function () {
     const nameInput1 = document.getElementById("input1");
     const nameInput2 = document.getElementById("input2");
+    const playersDiv = document.querySelector(".players");
     if (nameInput1 != "" && nameInput2 != "") {
       gameController.startGame();
 
@@ -167,9 +204,10 @@ const displayController = (() => {
         button.classList.remove("no-click");
       });
 
-      nameInput1.remove();
-      nameInput2.remove();
+      playersDiv.remove();
       startGameBtn.remove();
+
+      playingDisplay();
     }
   });
 

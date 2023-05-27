@@ -71,6 +71,11 @@ const gameController = (() => {
     endGame();
   };
 
+  const announceTie = () => {
+    const container = document.querySelector(".playersContainer");
+    container.innerText = `It's a tie!`;
+  };
+
   const checkWinnerRow = (index) => {
     const first = board[index].getValue();
     const second = board[index + 1].getValue();
@@ -131,6 +136,7 @@ const gameController = (() => {
     board[index].setValue(digit);
     checkWinner();
     if (GameBoard.isTie() == true) {
+      announceTie();
       endGame();
     }
   };

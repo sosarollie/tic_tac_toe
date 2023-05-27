@@ -7,21 +7,34 @@
     <title>Tic Tac Toe</title>
     <link rel="stylesheet" href="styles.css" />
     <link rel="reset" href="reset.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Carter+One&family=Qwigley&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <header>
-      <h1>Tic-Tac-Toe</h1>
+      <h1 class="gradient">Tic-Tac-Toe</h1>
     </header>
     <main>
       <div class="players">
         <input type="text" id="input1" />
-        VS
+        <h2 class="gradient vs">VS</h2>
         <input type="text" id="input2" />
       </div>
       <button id="startBtn">Start Game</button>
       <div class="gridContainer"></div>
     </main>
-    <footer></footer>
+    <footer>
+      <i class="fa-brands fa-github gradient" style="color: #7575ca"></i>
+      Copyright 2023 @sosarollie
+    </footer>
   </body>
 </html>
 <script src="app.js"></script>
+<script
+  src="https://kit.fontawesome.com/13da04c02e.js"
+  crossorigin="anonymous"
+></script>
